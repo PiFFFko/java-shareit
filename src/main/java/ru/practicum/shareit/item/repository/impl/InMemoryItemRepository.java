@@ -38,9 +38,9 @@ public class InMemoryItemRepository implements ItemRepository {
         if (text.equals(""))
             return Collections.emptyList();
         return itemRepository.values().stream()
-                .filter(item -> (item.getName().toLowerCase().contains(text.toLowerCase())
-                        || item.getDescription().toLowerCase().contains(text.toLowerCase())
-                & item.getAvailable().equals(Boolean.TRUE)))
+                .filter(item -> item.getName().toLowerCase().contains(text.toLowerCase())
+                        || item.getDescription().toLowerCase().contains(text.toLowerCase()))
+                .filter(Item::getAvailable)
                 .collect(Collectors.toList());
     }
 

@@ -1,7 +1,7 @@
 package ru.practicum.shareit.user.service;
 
 import ru.practicum.shareit.user.User;
-import java.util.Collection;
+
 import java.util.List;
 
 public interface UserService {

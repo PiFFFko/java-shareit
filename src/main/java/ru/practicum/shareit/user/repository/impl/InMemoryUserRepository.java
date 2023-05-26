@@ -6,7 +6,10 @@ import ru.practicum.shareit.exception.EntityNotExistException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Repository
 public class InMemoryUserRepository implements UserRepository {
@@ -40,7 +43,7 @@ public class InMemoryUserRepository implements UserRepository {
             if (isEmailAlreadyExist(user))
                 throw new EntityAlreadyExistException("Пользователь с таким Email уже существует");
             User userToUpdate = userRepository.get(user.getId());
-            if (user.getName() != null){
+            if (user.getName() != null) {
                 userToUpdate.setName(user.getName().isBlank() ? userToUpdate.getName() : user.getName());
             }
             userToUpdate.setEmail(user.getEmail() == null ? userToUpdate.getEmail() : user.getEmail());

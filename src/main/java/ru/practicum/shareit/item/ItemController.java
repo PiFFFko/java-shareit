@@ -34,7 +34,7 @@ public class ItemController {
     @GetMapping("/search")
     public Collection<ItemDto> searchItems(@RequestParam String text) {
         log.info("GET на поиск по слову: {}", text);
-        if (text.isBlank()){
+        if (text.isBlank()) {
             return Collections.emptyList();
         }
         return ItemMapper.toListItemDto(itemService.searchItems(text));

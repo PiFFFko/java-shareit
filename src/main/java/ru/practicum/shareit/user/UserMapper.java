@@ -21,7 +21,7 @@ public class UserMapper {
                 userDto.getEmail());
     }
 
-    public static List<UserDto> toListUserDto(List<User> users){
+    public static List<UserDto> toListUserDto(List<User> users) {
         return users.stream().map(UserMapper::toUserDto).collect(Collectors.toList());
     }
 }

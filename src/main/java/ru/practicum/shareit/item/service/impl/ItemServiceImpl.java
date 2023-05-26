@@ -3,14 +3,12 @@ package ru.practicum.shareit.item.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.Item;
-import ru.practicum.shareit.item.ItemMapper;
-import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -20,42 +18,37 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
 
     @Override
-    public Collection<ItemDto> getAllUserItems(Integer userId) {
-        return itemRepository.getAllUserItems(userId)
-                .stream()
-                .map(ItemMapper::toItemDto)
-                .collect(Collectors.toList());
+    public List<Item> getAllUserItems(Long userId) {
+        return itemRepository.getAllUserItems(userId);
     }
 
     @Override
-    public ItemDto getItem(Integer itemId) {
-        return ItemMapper.toItemDto(itemRepository.getItem(itemId));
+    public Item getItem(Long itemId) {
+        return itemRepository.getItem(itemId);
     }
 
     @Override
-    public Collection<ItemDto> searchItems(String text) {
-        return itemRepository.searchItems(text).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
+    public List<Item> searchItems(String text) {
+        return itemRepository.searchItems(text);
     }
 
     @Override
-    public ItemDto createItem(Integer userId, ItemDto itemDto) {
+    public Item createItem(Long userId, Item item) {
         //Если пользователь отсутствует, то выкинется исключение
         userRepository.getUser(userId);
-        Item item = ItemMapper.toItem(itemDto);
         item.setOwner(userId);
-        return ItemMapper.toItemDto(itemRepository.createItem(item));
+        return itemRepository.createItem(item);
     }
 
     @Override
-    public ItemDto updateItem(Integer userId, ItemDto itemDto, Integer itemId) {
-        Item item = ItemMapper.toItem(itemDto);
+    public Item updateItem(Long userId, Item item, Long itemId) {
         item.setOwner(userId);
         item.setId(itemId);
-        return ItemMapper.toItemDto(itemRepository.updateItem(item));
+        return itemRepository.updateItem(item);
     }
 
     @Override
-    public void deleteItem(Integer itemId) {
+    public void deleteItem(Long itemId) {
         itemRepository.deleteItem(itemId);
     }
 }

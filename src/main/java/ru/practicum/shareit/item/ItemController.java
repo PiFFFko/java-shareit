@@ -8,6 +8,8 @@ import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -18,39 +20,42 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping
-    private Collection<ItemDto> getAllUserItems(@RequestHeader("X-Sharer-User-Id") Integer userId) {
-        log.info("GET на получение всех вещей пользователя с ID ", userId);
-        return itemService.getAllUserItems(userId);
+    private List<ItemDto> getAllUserItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
+        log.info("GET на получение всех вещей пользователя с ID: {}", userId);
+        return ItemMapper.toListItemDto(itemService.getAllUserItems(userId));
     }
 
     @GetMapping("/{itemId}")
-    private ItemDto getItem(@PathVariable Integer itemId) {
-        log.info("GET на получение вещи с ID ", itemId);
-        return itemService.getItem(itemId);
+    private ItemDto getItem(@PathVariable Long itemId) {
+        log.info("GET на получение вещи с ID: {}", itemId);
+        return ItemMapper.toItemDto(itemService.getItem(itemId));
     }
 
     @GetMapping("/search")
     public Collection<ItemDto> searchItems(@RequestParam String text) {
-        log.info("GET на поиск по слову: ", text);
-        return itemService.searchItems(text);
+        log.info("GET на поиск по слову: {}", text);
+        if (text.isBlank()){
+            return Collections.emptyList();
+        }
+        return ItemMapper.toListItemDto(itemService.searchItems(text));
     }
 
     @PostMapping
-    private ItemDto createItem(@RequestHeader("X-Sharer-User-Id") Integer userId, @RequestBody @Valid ItemDto itemDto) {
+    private ItemDto createItem(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody @Valid ItemDto itemDto) {
         log.info("POST на создание вещи {}, владелец {}", itemDto, userId);
-        return itemService.createItem(userId, itemDto);
+        return ItemMapper.toItemDto(itemService.createItem(userId, ItemMapper.toItem(itemDto)));
     }
 
     @PatchMapping("/{itemId}")
-    private ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") Integer userId,
+    private ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") Long userId,
                                @RequestBody ItemDto itemDto,
-                               @PathVariable Integer itemId) {
+                               @PathVariable Long itemId) {
         log.info("PATCH на обновление вещи с ID {}, пользователем {}, данные для обновления: {}", itemId, userId, itemDto);
-        return itemService.updateItem(userId, itemDto, itemId);
+        return ItemMapper.toItemDto(itemService.updateItem(userId, ItemMapper.toItem(itemDto), itemId));
     }
 
     @DeleteMapping("/itemId")
-    private void deleteItem(@PathVariable Integer itemId) {
+    private void deleteItem(@PathVariable Long itemId) {
         log.info("DELETE на удаление вещи с ID {}", itemId);
         itemService.deleteItem(itemId);
     }

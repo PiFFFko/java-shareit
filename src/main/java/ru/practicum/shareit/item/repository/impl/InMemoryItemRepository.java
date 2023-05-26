@@ -6,27 +6,26 @@ import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.exception.UpdateByNotOwnerException;
 import ru.practicum.shareit.item.repository.ItemRepository;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryItemRepository implements ItemRepository {
 
-    private Map<Integer, Item> itemRepository = new HashMap<>();
-    private Integer idGenerator = 1;
+    private Map<Long, Item> itemRepository = new HashMap<>();
+    private Long idGenerator = Long.valueOf(1);
 
     @Override
-    public Collection<Item> getAllUserItems(Integer userId) {
+    public List<Item> getAllUserItems(Long userId) {
         return itemRepository.values().stream()
                 .filter(item -> item.getOwner().equals(userId))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Item getItem(Integer itemId) {
+    public Item getItem(Long itemId) {
         if (itemRepository.containsKey(itemId)) {
             return itemRepository.get(itemId);
         }
@@ -34,12 +33,11 @@ public class InMemoryItemRepository implements ItemRepository {
     }
 
     @Override
-    public Collection<Item> searchItems(String text) {
-        if (text.equals(""))
-            return Collections.emptyList();
+    public List<Item> searchItems(String text) {
+        String finalText = text.toLowerCase();
         return itemRepository.values().stream()
-                .filter(item -> item.getName().toLowerCase().contains(text.toLowerCase())
-                        || item.getDescription().toLowerCase().contains(text.toLowerCase()))
+                .filter(item -> item.getName().toLowerCase().contains(finalText)
+                        || item.getDescription().toLowerCase().contains(finalText))
                 .filter(Item::getAvailable)
                 .collect(Collectors.toList());
     }
@@ -56,10 +54,13 @@ public class InMemoryItemRepository implements ItemRepository {
         if (itemRepository.containsKey(item.getId())) {
             Item itemToUpdate = itemRepository.get(item.getId());
             if (item.getOwner().equals(itemToUpdate.getOwner())) {
-                itemToUpdate.setName(item.getName() == null ? itemToUpdate.getName() : item.getName());
-                itemToUpdate.setDescription(item.getDescription() == null ? itemToUpdate.getDescription() : item.getDescription());
+                if (item.getName() != null) {
+                    itemToUpdate.setName(item.getName().isBlank() ? itemToUpdate.getName() : item.getName());
+                }
+                if (item.getDescription() != null) {
+                    itemToUpdate.setDescription(item.getDescription().isBlank() ? itemToUpdate.getDescription() : item.getDescription());
+                }
                 itemToUpdate.setAvailable(item.getAvailable() == null ? itemToUpdate.getAvailable() : item.getAvailable());
-                itemRepository.put(itemToUpdate.getId(), itemToUpdate);
                 return itemToUpdate;
             } else {
                 throw new UpdateByNotOwnerException("Изменять данные о вещи может только ее владелец");
@@ -69,10 +70,9 @@ public class InMemoryItemRepository implements ItemRepository {
     }
 
     @Override
-    public void deleteItem(Integer itemId) {
-        if (itemRepository.containsKey(itemId)) {
-            itemRepository.remove(itemId);
-        } else
+    public void deleteItem(Long itemId) {
+        if (itemRepository.remove(itemId) == null) {
             throw new EntityNotExistException(String.format("Вещи с ID %s не найдено", itemId));
+        }
     }
 }

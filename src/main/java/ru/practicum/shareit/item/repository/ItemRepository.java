@@ -2,18 +2,18 @@ package ru.practicum.shareit.item.repository;
 
 import ru.practicum.shareit.item.Item;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface ItemRepository {
-    Collection<Item> getAllUserItems(Integer userId);
+    List<Item> getAllUserItems(Long userId);
 
-    Item getItem(Integer itemId);
+    Item getItem(Long itemId);
 
-    Collection<Item> searchItems(String text);
+    List<Item> searchItems(String text);
 
     Item createItem(Item item);
 
     Item updateItem(Item item);
 
-    void deleteItem(Integer itemId);
+    void deleteItem(Long itemId);
 }

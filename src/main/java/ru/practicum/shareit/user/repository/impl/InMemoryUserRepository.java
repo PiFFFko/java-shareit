@@ -23,8 +23,9 @@ public class InMemoryUserRepository implements UserRepository {
 
     @Override
     public User getUser(Long userId) {
-        if (userRepository.containsKey(userId))
-            return userRepository.get(userId);
+        User user = userRepository.get(userId);
+        if (user != null)
+            return user;
         throw new EntityNotExistException(String.format("Пользователься с ID %s не найдено", userId));
     }
 
@@ -43,10 +44,13 @@ public class InMemoryUserRepository implements UserRepository {
             if (isEmailAlreadyExist(user))
                 throw new EntityAlreadyExistException("Пользователь с таким Email уже существует");
             User userToUpdate = userRepository.get(user.getId());
-            if (user.getName() != null) {
-                userToUpdate.setName(user.getName().isBlank() ? userToUpdate.getName() : user.getName());
+            if (user.getName() != null && !user.getName().isBlank()) {
+                userToUpdate.setName(user.getName());
             }
-            userToUpdate.setEmail(user.getEmail() == null ? userToUpdate.getEmail() : user.getEmail());
+            if (user.getEmail() != null && !user.getEmail().isBlank()) {
+                userToUpdate.setEmail(user.getEmail());
+            }
+
             return userToUpdate;
         }
         throw new EntityNotExistException(String.format("Пользователься с ID %s не найдено", user.getId()));
@@ -54,10 +58,9 @@ public class InMemoryUserRepository implements UserRepository {
 
     @Override
     public void deleteUser(Long userId) {
-        if (userRepository.containsKey(userId)) {
-            userRepository.remove(userId);
-        } else
+        if (userRepository.remove(userId) == null) {
             throw new EntityNotExistException(String.format("Пользователься с ID %s не найдено", userId));
+        }
     }
 
     private Boolean isEmailAlreadyExist(User user) {

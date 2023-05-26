@@ -26,8 +26,9 @@ public class InMemoryItemRepository implements ItemRepository {
 
     @Override
     public Item getItem(Long itemId) {
-        if (itemRepository.containsKey(itemId)) {
-            return itemRepository.get(itemId);
+        Item item = itemRepository.get(itemId);
+        if (item != null) {
+            return item;
         }
         throw new EntityNotExistException(String.format("Вещи с ID не найдено", itemId));
     }
@@ -54,11 +55,11 @@ public class InMemoryItemRepository implements ItemRepository {
         if (itemRepository.containsKey(item.getId())) {
             Item itemToUpdate = itemRepository.get(item.getId());
             if (item.getOwner().equals(itemToUpdate.getOwner())) {
-                if (item.getName() != null) {
-                    itemToUpdate.setName(item.getName().isBlank() ? itemToUpdate.getName() : item.getName());
+                if (item.getName() != null && !item.getName().isBlank()) {
+                    itemToUpdate.setName(item.getName());
                 }
-                if (item.getDescription() != null) {
-                    itemToUpdate.setDescription(item.getDescription().isBlank() ? itemToUpdate.getDescription() : item.getDescription());
+                if (item.getDescription() != null && !item.getDescription().isBlank()) {
+                    itemToUpdate.setDescription(item.getDescription());
                 }
                 itemToUpdate.setAvailable(item.getAvailable() == null ? itemToUpdate.getAvailable() : item.getAvailable());
                 return itemToUpdate;

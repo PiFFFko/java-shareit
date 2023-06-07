@@ -1,7 +1,18 @@
 package ru.practicum.shareit.user;
 
-/**
- * TODO Sprint add-controllers.
- */
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.experimental.FieldDefaults;
+
+@Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
+    Long id;
+    String name;
+    String email;
+
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
 }

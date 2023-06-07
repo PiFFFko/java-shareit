@@ -1,6 +1,7 @@
 package ru.practicum.shareit.handler.error;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -9,6 +10,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.shareit.exception.EntityAlreadyExistException;
 import ru.practicum.shareit.exception.EntityNotExistException;
 import ru.practicum.shareit.item.exception.UpdateByNotOwnerException;
+
+import javax.validation.ConstraintViolationException;
 
 @Slf4j
 @RestControllerAdvice
@@ -48,6 +51,13 @@ public class ErrorHandler {
         log.error("Получен статус 403(FORBIDDEN), сообщение {}", e.getMessage());
         log.error("Stack-trace ошибки: {}", e.getStackTrace().toString());
         return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleConstraintError(final DataIntegrityViolationException e){
+        String message = e.getCause().getCause().getMessage();
+        return new ErrorResponse(message);
     }
 
     @ExceptionHandler

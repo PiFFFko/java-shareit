@@ -12,19 +12,19 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Repository
-public class InMemoryItemRepository implements ItemRepository {
+public class InMemoryItemRepository {
 
     private Map<Long, Item> itemRepository = new HashMap<>();
     private Long idGenerator = Long.valueOf(1);
 
-    @Override
+
     public List<Item> getAllUserItems(Long userId) {
         return itemRepository.values().stream()
                 .filter(item -> item.getOwner().equals(userId))
                 .collect(Collectors.toList());
     }
 
-    @Override
+
     public Item getItem(Long itemId) {
         Item item = itemRepository.get(itemId);
         if (item != null) {
@@ -33,7 +33,7 @@ public class InMemoryItemRepository implements ItemRepository {
         throw new EntityNotExistException(String.format("Вещи с ID не найдено", itemId));
     }
 
-    @Override
+
     public List<Item> searchItems(String text) {
         String finalText = text.toLowerCase();
         return itemRepository.values().stream()
@@ -43,14 +43,14 @@ public class InMemoryItemRepository implements ItemRepository {
                 .collect(Collectors.toList());
     }
 
-    @Override
+
     public Item createItem(Item item) {
         item.setId(idGenerator++);
         itemRepository.put(item.getId(), item);
         return item;
     }
 
-    @Override
+
     public Item updateItem(Item item) {
         if (itemRepository.containsKey(item.getId())) {
             Item itemToUpdate = itemRepository.get(item.getId());
@@ -70,7 +70,7 @@ public class InMemoryItemRepository implements ItemRepository {
         throw new EntityNotExistException(String.format("Вещи с ID %s не найдено", item.getId()));
     }
 
-    @Override
+
     public void deleteItem(Long itemId) {
         if (itemRepository.remove(itemId) == null) {
             throw new EntityNotExistException(String.format("Вещи с ID %s не найдено", itemId));

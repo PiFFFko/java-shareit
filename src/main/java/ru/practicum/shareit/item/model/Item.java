@@ -1,10 +1,10 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.model;
 
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.repository.cdi.Eager;
+import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
@@ -29,11 +29,19 @@ public class Item {
     User owner;
     @Column(name = "request_id")
     Long request;
+    @Transient
+    Booking nextBooking;
+    @Transient
+    Booking lastBooking;
 
     public Item(Long id, String name, String description, Boolean available) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.available = available;
+    }
+
+    public Item(Long id) {
+        this.id = id;
     }
 }

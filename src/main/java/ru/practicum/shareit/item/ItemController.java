@@ -3,7 +3,12 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CommentForPostDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
+import ru.practicum.shareit.item.mapper.CommentMapper;
+import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
@@ -20,15 +25,15 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping
-    private List<ItemDto> getAllUserItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    private List<ItemWithBookingsDto> getAllUserItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("GET на получение всех вещей пользователя с ID: {}", userId);
-        return ItemMapper.toListItemDto(itemService.getAllUserItems(userId));
+        return itemService.getAllUserItems(userId);
     }
 
     @GetMapping("/{itemId}")
-    private ItemDto getItem(@PathVariable Long itemId) {
+    private ItemWithBookingsDto getItem(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) {
         log.info("GET на получение вещи с ID: {}", itemId);
-        return ItemMapper.toItemDto(itemService.getItem(itemId));
+        return itemService.getItem(userId, itemId);
     }
 
     @GetMapping("/search")
@@ -60,4 +65,11 @@ public class ItemController {
         itemService.deleteItem(itemId);
     }
 
+    @PostMapping("/{itemId}/comment")
+    private CommentDto createComment(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                     @PathVariable Long itemId,
+                                     @RequestBody @Valid CommentForPostDto commmentDto) {
+        return CommentMapper.toCommentDto(itemService.createComment(userId, itemId, CommentMapper.toComment(commmentDto)));
+
+    }
 }

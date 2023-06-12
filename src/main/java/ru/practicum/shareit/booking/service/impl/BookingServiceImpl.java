@@ -41,8 +41,7 @@ public class BookingServiceImpl implements BookingService {
             throw new BookingByOwnerOfItemException("Вы являетесь пользователем вещи");
         }
         booking.setStatus(BookingStatus.WAITING);
-        Booking bookingToSave = bookingRepository.save(booking);
-        return bookingToSave;
+        return bookingRepository.save(booking);
     }
 
     @Override

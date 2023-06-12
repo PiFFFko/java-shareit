@@ -69,15 +69,13 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<Item> searchItems(String text) {
-        List<Item> items = itemRepository.findAllByNameContainingOrDescriptionContainingIgnoreCase(text);
-        return items;
+        return itemRepository.findAllByNameContainingOrDescriptionContainingIgnoreCase(text);
     }
 
     @Override
     public Item createItem(Long userId, Item item) {
         item.setOwner(userRepository.findById(userId).orElseThrow(() -> new EntityNotExistException("Такого пользователя нет")));
-        Item itemToSave = itemRepository.save(item);
-        return itemToSave;
+        return itemRepository.save(item);
     }
 
     @Override
@@ -114,7 +112,6 @@ public class ItemServiceImpl implements ItemService {
         comment.setAuthor(userRepository.findById(userId).orElseThrow(() -> new EntityNotExistException("Пользователя не существует")));
         comment.setItem(itemRepository.findById(itemId).orElseThrow(() -> new EntityNotExistException("Предмета не существует")));
         comment.setCreated(LocalDateTime.now());
-        Comment commentToSave = commentRepository.save(comment);
-        return commentToSave;
+        return commentRepository.save(comment);
     }
 }

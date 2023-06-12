@@ -25,13 +25,13 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping
-    private List<ItemWithBookingsDto> getAllUserItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public List<ItemWithBookingsDto> getAllUserItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("GET на получение всех вещей пользователя с ID: {}", userId);
         return itemService.getAllUserItems(userId);
     }
 
     @GetMapping("/{itemId}")
-    private ItemWithBookingsDto getItem(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) {
+    public ItemWithBookingsDto getItem(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) {
         log.info("GET на получение вещи с ID: {}", itemId);
         return itemService.getItem(userId, itemId);
     }
@@ -46,13 +46,13 @@ public class ItemController {
     }
 
     @PostMapping
-    private ItemDto createItem(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody @Valid ItemDto itemDto) {
+    public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody @Valid ItemDto itemDto) {
         log.info("POST на создание вещи {}, владелец {}", itemDto, userId);
         return ItemMapper.toItemDto(itemService.createItem(userId, ItemMapper.toItem(itemDto)));
     }
 
     @PatchMapping("/{itemId}")
-    private ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") Long userId,
                                @RequestBody ItemDto itemDto,
                                @PathVariable Long itemId) {
         log.info("PATCH на обновление вещи с ID {}, пользователем {}, данные для обновления: {}", itemId, userId, itemDto);
@@ -60,13 +60,13 @@ public class ItemController {
     }
 
     @DeleteMapping("/itemId")
-    private void deleteItem(@PathVariable Long itemId) {
+    public void deleteItem(@PathVariable Long itemId) {
         log.info("DELETE на удаление вещи с ID {}", itemId);
         itemService.deleteItem(itemId);
     }
 
     @PostMapping("/{itemId}/comment")
-    private CommentDto createComment(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public CommentDto createComment(@RequestHeader("X-Sharer-User-Id") Long userId,
                                      @PathVariable Long itemId,
                                      @RequestBody @Valid CommentForPostDto commmentDto) {
         return CommentMapper.toCommentDto(itemService.createComment(userId, itemId, CommentMapper.toComment(commmentDto)));

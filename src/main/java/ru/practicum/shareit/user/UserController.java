@@ -20,31 +20,31 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    private List<UserDto> getAllUsers() {
+    public List<UserDto> getAllUsers() {
         log.info("GET на получение всех пользователей");
         return UserMapper.toListUserDto(userService.getAllUsers());
     }
 
     @GetMapping("/{userId}")
-    private UserDto getUser(@PathVariable Long userId) {
+    public UserDto getUser(@PathVariable Long userId) {
         log.info("GET на получение пользователя {}", userId);
         return UserMapper.toUserDto(userService.getUser(userId));
     }
 
     @PostMapping
-    private UserDto createUser(@RequestBody @Validated(Create.class) UserDto userDto) {
+    public UserDto createUser(@RequestBody @Validated(Create.class) UserDto userDto) {
         log.info("POST на создание пользователя: {}", userDto);
         return UserMapper.toUserDto(userService.createUser(UserMapper.toUser(userDto)));
     }
 
     @PatchMapping("/{userId}")
-    private UserDto updateUser(@RequestBody @Validated(Update.class) UserDto userDto, @PathVariable Long userId) {
+    public UserDto updateUser(@RequestBody @Validated(Update.class) UserDto userDto, @PathVariable Long userId) {
         log.info("PATCH на обновление пользователя с ID {}, данные для обновления: {}", userId, userDto);
         return UserMapper.toUserDto(userService.updateUser(UserMapper.toUser(userDto), userId));
     }
 
     @DeleteMapping("/{userId}")
-    private void deleteUser(@PathVariable Long userId) {
+    public void deleteUser(@PathVariable Long userId) {
         log.info("DELETE на пользователя с id {}", userId);
         userService.deleteUser(userId);
     }

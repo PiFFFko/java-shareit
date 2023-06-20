@@ -5,20 +5,21 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import ru.practicum.shareit.booking.dto.ShortBooking;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ItemDto {
+public class ItemWithBookingsDto {
     Long id;
-    @NotBlank
     String name;
-    @NotBlank
     String description;
-    @NotNull
     Boolean available;
+    ShortBooking nextBooking;
+    ShortBooking lastBooking;
+    List<CommentDto> comments;
+
 }

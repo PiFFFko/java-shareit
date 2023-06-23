@@ -13,6 +13,7 @@ import ru.practicum.shareit.booking.exception.BookingUpdateException;
 import ru.practicum.shareit.booking.exception.IncorrectTimeOfBookingException;
 import ru.practicum.shareit.exception.EntityAlreadyExistException;
 import ru.practicum.shareit.exception.EntityNotExistException;
+import ru.practicum.shareit.exception.InvalidParameterException;
 import ru.practicum.shareit.item.exception.CommentByNotBookerException;
 import ru.practicum.shareit.item.exception.ItemNotAvailableException;
 import ru.practicum.shareit.item.exception.UpdateByNotOwnerException;
@@ -45,7 +46,8 @@ public class ErrorHandler {
             ItemNotAvailableException.class,
             IncorrectTimeOfBookingException.class,
             BookingUpdateException.class,
-            CommentByNotBookerException.class})
+            CommentByNotBookerException.class,
+            InvalidParameterException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleItemNotAvailable(final RuntimeException e) {
         log.error("Получен статус 400(BAD REQUEST), сообщение {}", e.getMessage());

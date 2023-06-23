@@ -3,10 +3,7 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.CommentDto;
-import ru.practicum.shareit.item.dto.CommentForPostDto;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.service.ItemService;
@@ -48,15 +45,15 @@ public class ItemController {
     @PostMapping
     public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody @Valid ItemDto itemDto) {
         log.info("POST на создание вещи {}, владелец {}", itemDto, userId);
-        return ItemMapper.toItemDto(itemService.createItem(userId, ItemMapper.toItem(itemDto)));
+        return itemService.createItem(userId, itemDto);
     }
 
     @PatchMapping("/{itemId}")
     public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") Long userId,
-                               @RequestBody ItemDto itemDto,
-                               @PathVariable Long itemId) {
+                              @RequestBody ItemDto itemDto,
+                              @PathVariable Long itemId) {
         log.info("PATCH на обновление вещи с ID {}, пользователем {}, данные для обновления: {}", itemId, userId, itemDto);
-        return ItemMapper.toItemDto(itemService.updateItem(userId, ItemMapper.toItem(itemDto), itemId));
+        return itemService.updateItem(userId, itemDto, itemId);
     }
 
     @DeleteMapping("/itemId")
@@ -67,9 +64,9 @@ public class ItemController {
 
     @PostMapping("/{itemId}/comment")
     public CommentDto createComment(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                     @PathVariable Long itemId,
-                                     @RequestBody @Valid CommentForPostDto commmentDto) {
-        return CommentMapper.toCommentDto(itemService.createComment(userId, itemId, CommentMapper.toComment(commmentDto)));
+                                    @PathVariable Long itemId,
+                                    @RequestBody @Valid CommentForPostDto commentDto) {
+        return CommentMapper.toCommentDto(itemService.createComment(userId, itemId, CommentMapper.toComment(commentDto)));
 
     }
 }

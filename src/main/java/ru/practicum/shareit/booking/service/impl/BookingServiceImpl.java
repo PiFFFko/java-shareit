@@ -1,6 +1,9 @@
 package ru.practicum.shareit.booking.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
@@ -16,6 +19,7 @@ import ru.practicum.shareit.item.exception.ItemNotAvailableException;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -69,32 +73,35 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getAllBookingsForBooker(Long userId, BookingState state) {
-        List<Booking> bookings;
+    public List<Booking> getAllBookingsForBooker(Long userId, BookingState state, Long from, Long size) {
+        List<Booking> bookings = new ArrayList<>();
         userRepository.findById(userId).orElseThrow(() -> new EntityNotExistException("пользователя не существует"));
+        Sort sortByCreated = Sort.by("end").descending();
+        from = from > 0 ? from / size : 0;
+        Pageable page = PageRequest.of(from.intValue(), size.intValue(), sortByCreated);
         switch (state) {
             case ALL: {
-                bookings = bookingRepository.findAllByBookerId(userId);
+                bookings = bookingRepository.findAllByBookerId(userId, page);
                 break;
             }
             case PAST: {
-                bookings = bookingRepository.findAllPastByUserIdAndSortByDesc(userId);
+                bookings = bookingRepository.findAllPastByUserIdAndSortByDesc(userId, page);
                 break;
             }
             case FUTURE: {
-                bookings = bookingRepository.findAllFutureByUserIdAndSortByDesc(userId);
+                bookings = bookingRepository.findAllFutureByUserIdAndSortByDesc(userId, page);
                 break;
             }
             case CURRENT: {
-                bookings = bookingRepository.findAllCurrentByUserIdAndSortByDesc(userId);
+                bookings = bookingRepository.findAllCurrentByUserIdAndSortByDesc(userId, page);
                 break;
             }
             case WAITING: {
-                bookings = bookingRepository.findAllWaitingByUserIdAndSortByDesc(userId);
+                bookings = bookingRepository.findAllWaitingByUserIdAndSortByDesc(userId, page);
                 break;
             }
             case REJECTED: {
-                bookings = bookingRepository.findAllRejectedByUserIdAndSortByDesc(userId);
+                bookings = bookingRepository.findAllRejectedByUserIdAndSortByDesc(userId, page);
                 break;
             }
             default: {
@@ -106,32 +113,38 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getAllBookingsForOwner(Long userId, BookingState state) {
-        List<Booking> bookings;
+    public List<Booking> getAllBookingsForOwner(Long userId, BookingState state, Long from, Long size) {
+        List<Booking> bookings = new ArrayList<>();
         userRepository.findById(userId).orElseThrow(() -> new EntityNotExistException("пользователя не существует"));
+        Sort sortByEnd = Sort.by("end").descending();
+        from = from > 0 ? from / size : 0;
+        Pageable page = PageRequest.of(from.intValue(), size.intValue(), sortByEnd);
         switch (state) {
             case ALL: {
-                bookings = bookingRepository.findAllByOwnerId(userId);
+                bookings = bookingRepository.findAllByOwnerId(userId, page);
                 break;
             }
             case PAST: {
-                bookings = bookingRepository.findAllPastByOwnerIdAndSortByDesc(userId);
+
+                bookings = bookingRepository.findAllPastByOwnerIdAndSortByDesc(userId, page);
+
                 break;
             }
             case FUTURE: {
-                bookings = bookingRepository.findAllFutureByOwnerIdAndSortByDesc(userId);
+                bookings = bookingRepository.findAllFutureByOwnerIdAndSortByDesc(userId, page);
                 break;
             }
             case CURRENT: {
-                bookings = bookingRepository.findAllCurrentByOwnerIdAndSortByDesc(userId);
+                bookings = bookingRepository.findAllCurrentByOwnerIdAndSortByDesc(userId, page);
                 break;
             }
             case WAITING: {
-                bookings = bookingRepository.findAllWaitingByOwnerIdAndSortByDesc(userId);
+                bookings = bookingRepository.findAllWaitingByOwnerIdAndSortByDesc(userId, page);
+
                 break;
             }
             case REJECTED: {
-                bookings = bookingRepository.findAllRejectedByOwnerIdAndSortByDesc(userId);
+                bookings = bookingRepository.findAllRejectedByOwnerIdAndSortByDesc(userId, page);
                 break;
             }
             default: {

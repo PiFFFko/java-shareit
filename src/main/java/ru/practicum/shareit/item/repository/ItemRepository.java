@@ -19,4 +19,12 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             " or upper(i.description) like upper(concat('%', ?1, '%')))" +
             " and i.available = true")
     List<Item> findAllByNameContainingOrDescriptionContainingIgnoreCase(String text);
+
+    @Query("select i " +
+            "from Item i " +
+            "join i.request as r " +
+            "where r.id = ?1 " +
+            "order by r.created desc")
+    List<Item> findItemsByRequest(Long requestId);
+
 }

@@ -19,7 +19,6 @@ import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 

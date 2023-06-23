@@ -15,16 +15,16 @@ import ru.practicum.shareit.user.service.UserService;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
-    private UserService userService;
     private final EasyRandom generator = new EasyRandom();
-
     @Mock
     UserRepository userRepository;
+    private UserService userService;
 
     @BeforeEach
     public void beforeEach() {
@@ -72,7 +72,7 @@ class UserServiceImplTest {
         User user = generator.nextObject(User.class);
         when(userRepository.findById(Mockito.anyLong()))
                 .thenThrow(EntityNotExistException.class);
-        assertThrows(EntityNotExistException.class, ()-> userService.updateUser(user, user.getId()));
+        assertThrows(EntityNotExistException.class, () -> userService.updateUser(user, user.getId()));
         verify(userRepository, never()).save(Mockito.any(User.class));
     }
 

@@ -8,12 +8,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import ru.practicum.shareit.exception.EntityNotExistException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.request.ItemRequestMapper;
 import ru.practicum.shareit.request.ItemRequestRepository;
+import ru.practicum.shareit.request.dto.ItemRequestDtoWithItems;
 import ru.practicum.shareit.request.dto.ShortItemRequestDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.User;
@@ -104,6 +107,41 @@ class ItemRequestServiceImplTest {
         Mockito.when(itemRequestRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(itemRequest));
         Assertions.assertEquals(itemRequest.getDescription(),
                 itemRequestService.getRequest(generator.nextLong(), generator.nextLong()).getDescription());
+    }
+
+    @Test
+    void getRequestWhenNoUser() {
+        ItemRequest itemRequest = generator.nextObject(ItemRequest.class);
+
+        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+        Assertions.assertThrows(EntityNotExistException.class, () ->
+                itemRequestService.getRequest(1L, 1L));
+    }
+
+    @Test
+    void getRequestWhenNoItemRequest() {
+        ItemRequest itemRequest = generator.nextObject(ItemRequest.class);
+
+        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(user));
+        Mockito.when(itemRequestRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+        Assertions.assertThrows(EntityNotExistException.class, () ->
+                itemRequestService.getRequest(1L, 1L));
+    }
+
+    @Test
+    void getRequestByPages() {
+        ItemRequest itemRequest = generator.nextObject(ItemRequest.class);
+        Item item = generator.nextObject(Item.class);
+        Mockito.when(itemRequestRepository.findByRequestor_IdNot(Mockito.anyLong(), Mockito.any()))
+                .thenAnswer(invocationOnMock -> {
+                    List<ItemRequest> itemRequests = List.of(itemRequest);
+                    Page<ItemRequest> page = new PageImpl<>(itemRequests);
+                    return page;
+                });
+        Mockito.when(itemRepository.findItemsByRequest(Mockito.anyLong()))
+                .thenReturn(List.of(item));
+        List<ItemRequestDtoWithItems> itemRequestDtoWithItems = itemRequestService.getRequestsByPages(1L, 5L, 5L);
+        Assertions.assertEquals(item.getName(),itemRequestDtoWithItems.get(0).getItems().get(0).getName());
     }
 
 }

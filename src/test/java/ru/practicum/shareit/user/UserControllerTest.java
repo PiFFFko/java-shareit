@@ -14,6 +14,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
@@ -114,6 +115,17 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.id", is(userDto.getId()), Long.class))
                 .andExpect(jsonPath("$.email", is(userDto.getEmail()), String.class))
                 .andExpect(jsonPath("$.name", is(userDto.getName()), String.class));
+    }
+
+    @Test
+    void getUsers() throws Exception {
+        when(userService.getAllUsers())
+                .thenReturn(List.of(UserMapper.toUser(userDto)));
+        mvc.perform(get("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.[*].id").isArray())
+                .andExpect(jsonPath("$.[*].id").exists());
     }
 
     @Test

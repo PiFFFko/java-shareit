@@ -16,8 +16,10 @@ import ru.practicum.shareit.booking.BookingState;
 import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.exception.BookingAccessException;
 import ru.practicum.shareit.booking.exception.BookingByOwnerOfItemException;
+import ru.practicum.shareit.booking.exception.BookingUpdateException;
 import ru.practicum.shareit.booking.exception.IncorrectTimeOfBookingException;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.exception.EntityNotExistException;
 import ru.practicum.shareit.item.exception.ItemNotAvailableException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -138,7 +140,7 @@ class BookingServiceImplTest {
         booking.setStatus(BookingStatus.APPROVED);
         Mockito.when(bookingRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.of(booking));
-        assertThrows(BookingAccessException.class, () -> bookingService.changeApprovedBookingStatus(1L, 1L, approved));
+        assertThrows(BookingUpdateException.class, () -> bookingService.changeApprovedBookingStatus(user.getId(), 1L, approved));
     }
 
 
@@ -161,10 +163,24 @@ class BookingServiceImplTest {
     }
 
     @Test
+    void getBookingFailCauseNoBooking() {
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.empty());
+        assertThrows(EntityNotExistException.class, () -> bookingService.getBooking(1L, 1L));
+    }
+
+    @Test
     void getBookingFailCauseNotOwnerOrBooker() {
         Mockito.when(bookingRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.of(booking));
         assertThrows(BookingAccessException.class, () -> bookingService.getBooking(booking.getBooker().getId() + 1, 1L));
+    }
+
+    @Test
+    void getAllBookingsForBookerPastFailCauseNoUser() {
+        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+        assertThrows(EntityNotExistException.class, () -> bookingService.getAllBookingsForBooker(1L, BookingState.PAST, 1L, 1L));
+
     }
 
     @Test
@@ -255,6 +271,12 @@ class BookingServiceImplTest {
 
         List<Booking> result = bookingService.getAllBookingsForBooker(userId, state, from, size);
         Assertions.assertEquals(booking, result.get(0));
+    }
+
+    @Test
+    void getAllBookingsForOwnerPastFailCauseNoUser() {
+        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+        assertThrows(EntityNotExistException.class, () -> bookingService.getAllBookingsForOwner(1L, BookingState.PAST, 1L, 1L));
     }
 
     @Test

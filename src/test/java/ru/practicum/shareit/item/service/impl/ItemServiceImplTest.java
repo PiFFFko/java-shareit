@@ -193,7 +193,7 @@ class ItemServiceImplTest {
     @Test
     void updateItemWhenUserNotExist() {
         ItemDto itemDto = ItemMapper.toItemDto(item);
-        Item itemToUpdate = generator.nextObject(Item.class);
+        Item itemToUpdate = new Item(1L, "test", "description",true,user);
         itemToUpdate.setOwner(user);
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.empty());

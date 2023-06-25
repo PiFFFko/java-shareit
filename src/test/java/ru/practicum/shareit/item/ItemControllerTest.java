@@ -11,13 +11,16 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -133,5 +136,88 @@ class ItemControllerTest {
                 .andExpect(status().is4xxClientError());
     }
 
+    @Test
+    void getAllUserItems() throws Exception {
+        ItemWithBookingsDto itemWithBookingsDto = generator.nextObject(ItemWithBookingsDto.class);
+        when(itemService.getAllUserItems(Mockito.anyLong()))
+                .thenReturn(List.of(itemWithBookingsDto));
+        mvc.perform(get("/items")
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .header("X-Sharer-User-Id", 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[*]").isArray())
+                .andExpect(jsonPath("$.[*].id").exists());
+
+    }
+
+
+    @Test
+    void getItem() throws Exception {
+        ItemWithBookingsDto itemWithBookingsDto = generator.nextObject(ItemWithBookingsDto.class);
+        when(itemService.getItem(Mockito.anyLong(), Mockito.anyLong()))
+                .thenReturn(itemWithBookingsDto);
+        mvc.perform(get("/items/1")
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .header("X-Sharer-User-Id", 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.name").exists())
+                .andExpect(jsonPath("$.comments").isArray());
+    }
+
+
+    @Test
+    void searchItem() throws Exception {
+        Item item = generator.nextObject(Item.class);
+        when(itemService.searchItems(Mockito.anyString()))
+                .thenReturn(List.of(item));
+        mvc.perform(get("/items/search")
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .param("text", "parameter")
+                        .header("X-Sharer-User-Id", 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[*].id").exists())
+                .andExpect(jsonPath("$.[*].name").exists());
+    }
+
+    @Test
+    void searchItemBlankForBlankText() throws Exception {
+        Item item = generator.nextObject(Item.class);
+        when(itemService.searchItems(Mockito.anyString()))
+                .thenReturn(List.of(item));
+        mvc.perform(get("/items/search")
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .param("text", "")
+                        .header("X-Sharer-User-Id", 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[*]").isEmpty());
+    }
+
+    @Test
+    void updateItemSuccess() throws Exception {
+        when(itemService.updateItem(Mockito.anyLong(), Mockito.any(ItemDto.class), Mockito.anyLong()))
+                .thenAnswer(invocationOnMock -> {
+                    itemDto.setId(1L);
+                    return itemDto;
+                });
+        mvc.perform(patch("/items/1")
+                        .content(objectMapper.writeValueAsString(itemDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .param("text", "")
+                        .header("X-Sharer-User-Id", 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.name").exists());
+    }
 
 }

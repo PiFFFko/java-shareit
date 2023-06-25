@@ -66,8 +66,8 @@ class BookingServiceImplTest {
     void createBookingSuccess() {
         Mockito.when(itemRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(item));
         Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(user));
-        Mockito.when(bookingRepository.save(Mockito.any())).
-                thenAnswer(invocationOnMock -> {
+        Mockito.when(bookingRepository.save(Mockito.any()))
+                .thenAnswer(invocationOnMock -> {
                     booking.setId(1L);
                     return booking;
                 });

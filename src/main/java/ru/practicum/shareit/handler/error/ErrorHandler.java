@@ -51,7 +51,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleItemNotAvailable(final RuntimeException e) {
         log.error("Получен статус 400(BAD REQUEST), сообщение {}", e.getMessage());
-        log.error("Stack-trace ошибки: {}", e.getStackTrace().toString());
+        log.error("Stack-trace ошибки: {}", e);
         return new ErrorResponse(e.getMessage());
     }
 
@@ -84,7 +84,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleError(final Exception e) {
         log.error("Получен статус 500(INTERNAL_SERVER_ERROR), сообщение {}", e.getMessage());
-        log.error("Stack-trace ошибки: {}", e.getStackTrace().toString());
+        log.error("Stack-trace ошибки: {}", e.getCause());
         return new ErrorResponse(e.getMessage());
     }
 

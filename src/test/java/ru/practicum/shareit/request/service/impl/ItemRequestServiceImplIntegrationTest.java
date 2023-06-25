@@ -18,19 +18,20 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 class ItemRequestServiceImplIntegrationTest {
 
     private final EasyRandom generator = new EasyRandom();
     @Autowired
+    ItemRequestService itemRequestService;
+    @Autowired
     private UserRepository userRepository;
     @Autowired
     private ItemRequestRepository itemRequestRepository;
     private User user;
-    @Autowired
-    ItemRequestService itemRequestService;
 
     @BeforeEach
     void beforeEach() {

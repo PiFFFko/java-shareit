@@ -28,11 +28,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ItemControllerTest {
 
     @MockBean
-    ItemService itemService;
+    private ItemService itemService;
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
     @Autowired
-    MockMvc mvc;
+    private MockMvc mvc;
     private ItemDto itemDto;
     private EasyRandom generator = new EasyRandom();
 

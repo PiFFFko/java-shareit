@@ -26,7 +26,7 @@ class ItemRequestServiceImplIntegrationTest {
 
     private final EasyRandom generator = new EasyRandom();
     @Autowired
-    ItemRequestService itemRequestService;
+    private ItemRequestService itemRequestService;
     @Autowired
     private UserRepository userRepository;
     @Autowired

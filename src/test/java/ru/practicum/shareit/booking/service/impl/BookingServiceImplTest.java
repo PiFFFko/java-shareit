@@ -37,16 +37,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class BookingServiceImplTest {
 
     private final EasyRandom generator = new EasyRandom();
-    BookingService bookingService;
+    private BookingService bookingService;
     @Mock
-    BookingRepository bookingRepository;
+    private BookingRepository bookingRepository;
     @Mock
-    UserRepository userRepository;
+    private UserRepository userRepository;
     @Mock
-    ItemRepository itemRepository;
-    Item item;
-    User user;
-    Booking booking;
+    private ItemRepository itemRepository;
+    private Item item;
+    private User user;
+    private Booking booking;
 
     @BeforeEach
     void beforeEach() {

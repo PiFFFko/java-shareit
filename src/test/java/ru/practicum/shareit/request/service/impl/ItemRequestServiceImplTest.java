@@ -31,11 +31,11 @@ class ItemRequestServiceImplTest {
 
     private final EasyRandom generator = new EasyRandom();
     @Mock
-    ItemRequestRepository itemRequestRepository;
+    private ItemRequestRepository itemRequestRepository;
     @Mock
-    ItemRepository itemRepository;
+    private ItemRepository itemRepository;
     @Mock
-    UserRepository userRepository;
+    private UserRepository userRepository;
     private ItemRequestService itemRequestService;
     private User user;
 

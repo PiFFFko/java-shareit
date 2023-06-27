@@ -29,11 +29,11 @@ class ItemRequestControllerTest {
 
     private final EasyRandom generator = new EasyRandom();
     @MockBean
-    ItemRequestService itemRequestService;
+    private ItemRequestService itemRequestService;
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
     @Autowired
-    MockMvc mvc;
+    private MockMvc mvc;
 
     @Test
     void createRequestSuccess() throws Exception {

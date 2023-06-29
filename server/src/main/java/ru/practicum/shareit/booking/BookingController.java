@@ -3,12 +3,14 @@ package ru.practicum.shareit.booking;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingForPostDto;
 import ru.practicum.shareit.booking.exception.UnsupportedBookingStateException;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.InvalidParameterException;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,27 +21,27 @@ public class BookingController {
     private final BookingService bookingService;
 
     @PostMapping
-    public ResponseEntity createBooking(@RequestHeader(SHARER_USER_HEADER) Long userId,
-                                        @RequestBody @Valid BookingForPostDto bookingForPostDto) {
+    public ResponseEntity<BookingDto> createBooking(@RequestHeader(SHARER_USER_HEADER) Long userId,
+                                                      @RequestBody @Valid BookingForPostDto bookingForPostDto) {
         return ResponseEntity.ok().body(BookingMapper.toBookingDto(bookingService.createBooking(userId, BookingMapper.toBooking(bookingForPostDto))));
     }
 
     @PatchMapping("/{bookingId}")
-    public ResponseEntity changeApprovedBookingStatus(@RequestHeader(SHARER_USER_HEADER) Long userId, @PathVariable Long bookingId, @RequestParam boolean approved) {
+    public ResponseEntity<BookingDto> changeApprovedBookingStatus(@RequestHeader(SHARER_USER_HEADER) Long userId, @PathVariable Long bookingId, @RequestParam boolean approved) {
         return ResponseEntity.ok().body(BookingMapper.toBookingDto(bookingService.changeApprovedBookingStatus(userId, bookingId, approved)));
     }
 
     @GetMapping("/{bookingId}")
-    public ResponseEntity getBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseEntity<BookingDto> getBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
                                      @PathVariable Long bookingId) {
         return ResponseEntity.ok().body(BookingMapper.toBookingDto(bookingService.getBooking(userId, bookingId)));
     }
 
     @GetMapping
-    public ResponseEntity getAllBookingsForBooker(@RequestHeader(SHARER_USER_HEADER) Long userId,
-                                                  @RequestParam(defaultValue = "ALL", required = false) String state,
-                                                  @RequestParam(defaultValue = "0") Long from,
-                                                  @RequestParam(defaultValue = "5") Long size) {
+    public ResponseEntity<List<BookingDto>> getAllBookingsForBooker(@RequestHeader(SHARER_USER_HEADER) Long userId,
+                                                                    @RequestParam(defaultValue = "ALL", required = false) String state,
+                                                                    @RequestParam(defaultValue = "0") Long from,
+                                                                    @RequestParam(defaultValue = "5") Long size) {
         BookingState bookingState;
         try {
             bookingState = BookingState.valueOf(state);
@@ -56,7 +58,7 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    public ResponseEntity getAllBookingsForOwner(@RequestHeader(SHARER_USER_HEADER) Long userId,
+    public ResponseEntity<List<BookingDto>> getAllBookingsForOwner(@RequestHeader(SHARER_USER_HEADER) Long userId,
                                                  @RequestParam(defaultValue = "ALL", required = false) String state,
                                                  @RequestParam(defaultValue = "0") Long from,
                                                  @RequestParam(defaultValue = "5") Long size) {

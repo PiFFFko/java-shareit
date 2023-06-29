@@ -12,6 +12,7 @@ services:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
   server:
+    restart: on-failure
     build: server
     container_name: ShareIt_Server
     ports:
@@ -27,6 +28,7 @@ services:
       - POSTGRES_PASSWORD=root
 
   gateway:
+    restart: on-failure
     build: gateway
     container_name: ShareIt_gateway
     ports:

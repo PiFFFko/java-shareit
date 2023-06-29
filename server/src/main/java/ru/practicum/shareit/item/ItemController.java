@@ -4,14 +4,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.CommentForPostDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
 import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
 import java.util.Collections;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -22,19 +25,19 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping
-    public ResponseEntity getAllUserItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ResponseEntity<List<ItemWithBookingsDto>> getAllUserItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("GET на получение всех вещей пользователя с ID: {}", userId);
         return ResponseEntity.ok().body(itemService.getAllUserItems(userId));
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity getItem(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) {
+    public ResponseEntity<ItemWithBookingsDto> getItem(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) {
         log.info("GET на получение вещи с ID: {}", itemId);
         return ResponseEntity.ok().body(itemService.getItem(userId, itemId));
     }
 
     @GetMapping("/search")
-    public ResponseEntity searchItems(@RequestParam String text) {
+    public ResponseEntity<List<ItemDto>> searchItems(@RequestParam String text) {
         log.info("GET на поиск по слову: {}", text);
         if (text.isBlank()) {
             return ResponseEntity.ok().body(Collections.emptyList());
@@ -43,13 +46,13 @@ public class ItemController {
     }
 
     @PostMapping
-    public ResponseEntity createItem(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody @Valid ItemDto itemDto) {
+    public ResponseEntity<ItemDto> createItem(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody @Valid ItemDto itemDto) {
         log.info("POST на создание вещи {}, владелец {}", itemDto, userId);
         return ResponseEntity.ok().body(itemService.createItem(userId, itemDto));
     }
 
     @PatchMapping("/{itemId}")
-    public ResponseEntity updateItem(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseEntity<ItemDto> updateItem(@RequestHeader("X-Sharer-User-Id") Long userId,
                                      @RequestBody ItemDto itemDto,
                                      @PathVariable Long itemId) {
         log.info("PATCH на обновление вещи с ID {}, пользователем {}, данные для обновления: {}", itemId, userId, itemDto);
@@ -63,9 +66,9 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    public ResponseEntity createComment(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                        @PathVariable Long itemId,
-                                        @RequestBody @Valid CommentForPostDto commentDto) {
+    public ResponseEntity<CommentDto> createComment(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                                    @PathVariable Long itemId,
+                                                    @RequestBody @Valid CommentForPostDto commentDto) {
         return ResponseEntity.ok().body(CommentMapper.toCommentDto(itemService.createComment(userId, itemId, CommentMapper.toComment(commentDto))));
 
     }

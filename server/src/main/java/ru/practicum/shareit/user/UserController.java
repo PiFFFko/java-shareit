@@ -10,6 +10,8 @@ import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.utility.Create;
 import ru.practicum.shareit.utility.Update;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @AllArgsConstructor
@@ -19,25 +21,25 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity getAllUsers() {
+    public ResponseEntity<List<UserDto>> getAllUsers() {
         log.info("GET на получение всех пользователей");
         return ResponseEntity.ok().body(UserMapper.toListUserDto(userService.getAllUsers()));
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity getUser(@PathVariable Long userId) {
+    public ResponseEntity<UserDto> getUser(@PathVariable Long userId) {
         log.info("GET на получение пользователя {}", userId);
         return ResponseEntity.ok().body(UserMapper.toUserDto(userService.getUser(userId)));
     }
 
     @PostMapping
-    public ResponseEntity createUser(@RequestBody @Validated(Create.class) UserDto userDto) {
+    public ResponseEntity<UserDto> createUser(@RequestBody @Validated(Create.class) UserDto userDto) {
         log.info("POST на создание пользователя: {}", userDto);
         return ResponseEntity.ok().body(UserMapper.toUserDto(userService.createUser(UserMapper.toUser(userDto))));
     }
 
     @PatchMapping("/{userId}")
-    public ResponseEntity updateUser(@RequestBody @Validated(Update.class) UserDto userDto, @PathVariable Long userId) {
+    public ResponseEntity<UserDto> updateUser(@RequestBody @Validated(Update.class) UserDto userDto, @PathVariable Long userId) {
         log.info("PATCH на обновление пользователя с ID {}, данные для обновления: {}", userId, userDto);
         return ResponseEntity.ok().body(UserMapper.toUserDto(userService.updateUser(UserMapper.toUser(userDto), userId)));
     }

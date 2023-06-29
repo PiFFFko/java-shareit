@@ -11,8 +11,8 @@ import ru.practicum.shareit.booking.exception.BookingAccessException;
 import ru.practicum.shareit.booking.exception.BookingByOwnerOfItemException;
 import ru.practicum.shareit.booking.exception.BookingUpdateException;
 import ru.practicum.shareit.booking.exception.IncorrectTimeOfBookingException;
-import ru.practicum.shareit.exception.EntityAlreadyExistException;
 import ru.practicum.shareit.exception.EntityNotExistException;
+import ru.practicum.shareit.exception.InvalidParameterException;
 import ru.practicum.shareit.item.exception.CommentByNotBookerException;
 import ru.practicum.shareit.item.exception.ItemNotAvailableException;
 import ru.practicum.shareit.item.exception.UpdateByNotOwnerException;
@@ -20,13 +20,6 @@ import ru.practicum.shareit.item.exception.UpdateByNotOwnerException;
 @Slf4j
 @RestControllerAdvice
 public class ErrorHandler {
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleAlreadyExist(final EntityAlreadyExistException e) {
-        log.error("Получен статус 409(Conflict), сообщение {}", e.getMessage());
-        log.error("Stack-trace ошибки: {}", e.getStackTrace().toString());
-        return new ErrorResponse(e.getMessage());
-    }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -45,11 +38,12 @@ public class ErrorHandler {
             ItemNotAvailableException.class,
             IncorrectTimeOfBookingException.class,
             BookingUpdateException.class,
-            CommentByNotBookerException.class})
+            CommentByNotBookerException.class,
+            InvalidParameterException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleItemNotAvailable(final RuntimeException e) {
         log.error("Получен статус 400(BAD REQUEST), сообщение {}", e.getMessage());
-        log.error("Stack-trace ошибки: {}", e.getStackTrace().toString());
+        log.error("Stack-trace ошибки: {}", e);
         return new ErrorResponse(e.getMessage());
     }
 
@@ -82,7 +76,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleError(final Exception e) {
         log.error("Получен статус 500(INTERNAL_SERVER_ERROR), сообщение {}", e.getMessage());
-        log.error("Stack-trace ошибки: {}", e.getStackTrace().toString());
+        log.error("Stack-trace ошибки: {}", e.getCause());
         return new ErrorResponse(e.getMessage());
     }
 

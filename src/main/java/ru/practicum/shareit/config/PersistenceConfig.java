@@ -9,7 +9,6 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.persistence.EntityManagerFactory;
-import java.util.Properties;
 
 @Configuration
 @EnableTransactionManagement
@@ -20,17 +19,6 @@ public class PersistenceConfig {
 
     public PersistenceConfig(Environment environment) {
         this.environment = environment;
-    }
-
-    private Properties hibernateProperties() {
-        Properties properties = new Properties();
-        properties.put("hibernate.dialect", environment.getRequiredProperty("hibernate.dialect"));
-        properties.put("hibernate.show_sql", environment.getProperty("hibernate.show_sql", "false"));
-        properties.put("javax.persistence.schema-generation.database.action",
-                environment.getProperty("javax.persistence.schema-generation.database.action", "none"));
-        properties.put("javax.persistence.schema-generation.create-script-source",
-                environment.getProperty("javax.persistence.schema-generation.create-script-source"));
-        return properties;
     }
 
     @Bean

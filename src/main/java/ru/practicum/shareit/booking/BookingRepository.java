@@ -1,10 +1,13 @@
 package ru.practicum.shareit.booking;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("select b "
@@ -13,7 +16,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             + "join fetch b.item as i "
             + "where b.booker.id = ?1 "
             + "order by b.end desc")
-    List<Booking> findAllByBookerId(Long userId);
+    List<Booking> findAllByBookerId(Long userId, Pageable pageable);
 
     @Query("select b "
             + "from Booking as b "
@@ -21,7 +24,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             + "join fetch b.item as i "
             + "where b.booker.id = ?1 and b.start > current_timestamp "
             + "order by b.end desc")
-    List<Booking> findAllFutureByUserIdAndSortByDesc(Long bookerId);
+    List<Booking> findAllFutureByUserIdAndSortByDesc(Long bookerId, Pageable pageable);
 
     @Query("select b "
             + "from Booking as b "
@@ -29,7 +32,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             + "join fetch b.item as i "
             + "where b.booker.id = ?1 and b.end < current_timestamp "
             + "order by b.end desc")
-    List<Booking> findAllPastByUserIdAndSortByDesc(Long bookerId);
+    List<Booking> findAllPastByUserIdAndSortByDesc(Long bookerId, Pageable pageable);
 
     @Query("select b "
             + "from Booking as b "
@@ -37,7 +40,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             + "join fetch b.item as i "
             + "where b.booker.id = ?1 and b.status like 'WAITING' "
             + "order by b.end desc")
-    List<Booking> findAllWaitingByUserIdAndSortByDesc(Long bookerId);
+    List<Booking> findAllWaitingByUserIdAndSortByDesc(Long bookerId, Pageable pageable);
 
     @Query("select b "
             + "from Booking as b "
@@ -45,7 +48,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             + "join fetch b.item as i "
             + "where b.booker.id = ?1 and b.status like 'REJECTED' "
             + "order by b.end desc")
-    List<Booking> findAllRejectedByUserIdAndSortByDesc(Long bookerId);
+    List<Booking> findAllRejectedByUserIdAndSortByDesc(Long bookerId, Pageable pageable);
 
     @Query("select b "
             + "from Booking as b "
@@ -53,7 +56,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             + "join fetch b.item as i "
             + "where b.booker.id = ?1 and b.start <= current_timestamp and b.end >= current_timestamp "
             + "order by b.end desc")
-    List<Booking> findAllCurrentByUserIdAndSortByDesc(Long bookerId);
+    List<Booking> findAllCurrentByUserIdAndSortByDesc(Long bookerId, Pageable pageable);
 
     @Query("select b "
             + "from Booking as b "
@@ -61,7 +64,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             + "join fetch b.item as i "
             + "where i.owner.id = ?1 "
             + "order by b.end desc")
-    List<Booking> findAllByOwnerId(Long userId);
+    List<Booking> findAllByOwnerId(Long userId, Pageable pageable);
 
     @Query("select b "
             + "from Booking as b "
@@ -69,7 +72,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             + "join fetch b.item as i "
             + "where i.owner.id = ?1 and b.start > current_timestamp "
             + "order by b.end desc")
-    List<Booking> findAllFutureByOwnerIdAndSortByDesc(Long bookerId);
+    List<Booking> findAllFutureByOwnerIdAndSortByDesc(Long bookerId, Pageable pageable);
 
     @Query("select b "
             + "from Booking as b "
@@ -77,7 +80,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             + "join fetch b.item as i "
             + "where i.owner.id = ?1 and b.end < current_timestamp "
             + "order by b.end desc")
-    List<Booking> findAllPastByOwnerIdAndSortByDesc(Long bookerId);
+    List<Booking> findAllPastByOwnerIdAndSortByDesc(Long bookerId, Pageable pageable);
 
     @Query("select b "
             + "from Booking as b "
@@ -85,15 +88,14 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             + "join fetch b.item as i "
             + "where i.owner.id = ?1 and b.status like 'WAITING' "
             + "order by b.end desc")
-    List<Booking> findAllWaitingByOwnerIdAndSortByDesc(Long bookerId);
+    List<Booking> findAllWaitingByOwnerIdAndSortByDesc(Long bookerId, Pageable pageable);
 
     @Query("select b "
             + "from Booking as b "
-            + "join fetch b.booker as booker "
+            + "join fetch b.booker as book "
             + "join fetch b.item as i "
-            + "where i.owner.id = ?1 and b.status like 'REJECTED' "
-            + "order by b.end desc")
-    List<Booking> findAllRejectedByOwnerIdAndSortByDesc(Long bookerId);
+            + "where i.owner.id = ?1 and b.status like 'REJECTED' ")
+    List<Booking> findAllRejectedByOwnerIdAndSortByDesc(Long bookerId, Pageable pageable);
 
     @Query("select b "
             + "from Booking as b "
@@ -101,7 +103,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             + "join fetch b.item as i "
             + "where i.owner.id = ?1 and b.start <= current_timestamp and b.end >= current_timestamp "
             + "order by b.end desc")
-    List<Booking> findAllCurrentByOwnerIdAndSortByDesc(Long bookerId);
+    List<Booking> findAllCurrentByOwnerIdAndSortByDesc(Long bookerId, Pageable pageable);
 
     @Query("select b "
             + "from Booking as b "

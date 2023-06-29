@@ -1,11 +1,15 @@
 package ru.practicum.shareit.item.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.exception.EntityNotExistException;
 import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
 import ru.practicum.shareit.item.exception.CommentByNotBookerException;
 import ru.practicum.shareit.item.exception.UpdateByNotOwnerException;
@@ -16,6 +20,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
@@ -28,6 +33,7 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+    private final ItemRequestRepository itemRequestRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
 
@@ -73,14 +79,20 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item createItem(Long userId, Item item) {
+    public ItemDto createItem(Long userId, ItemDto itemDto) {
+        Item item = ItemMapper.toItem(itemDto);
         item.setOwner(userRepository.findById(userId).orElseThrow(() -> new EntityNotExistException("Такого пользователя нет")));
-        return itemRepository.save(item);
+        if (itemDto.getRequestId() != null) {
+            item.setRequest(itemRequestRepository.findById(itemDto.getRequestId()).orElseThrow(() -> new EntityNotExistException("Такого запроса нет")));
+        }
+        Item itemToSave = itemRepository.save(item);
+        return ItemMapper.toItemDto(itemToSave);
     }
 
     @Override
-    public Item updateItem(Long userId, Item item, Long itemId) {
+    public ItemDto updateItem(Long userId, ItemDto itemDto, Long itemId) {
         Item itemToUpdate = itemRepository.findById(itemId).orElseThrow(() -> new EntityNotExistException("Предмета не существует"));
+        Item item = ItemMapper.toItem(itemDto);
         item.setOwner(userRepository.findById(userId).orElseThrow(() -> new EntityNotExistException("Такого пользователя нет")));
         item.setId(itemId);
         if (item.getOwner().equals(itemToUpdate.getOwner())) {
@@ -92,7 +104,7 @@ public class ItemServiceImpl implements ItemService {
             }
             itemToUpdate.setAvailable(item.getAvailable() == null ? itemToUpdate.getAvailable() : item.getAvailable());
             itemRepository.save(itemToUpdate);
-            return itemToUpdate;
+            return ItemMapper.toItemDto(itemToUpdate);
         } else {
             throw new UpdateByNotOwnerException("Изменять данные о вещи может только ее владелец");
         }
@@ -105,7 +117,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Comment createComment(Long userId, Long itemId, Comment comment) {
-        List<Booking> bookings = bookingRepository.findAllPastByUserIdAndSortByDesc(userId);
+        Sort sortByCreated = Sort.by("end").descending();
+        Pageable page = PageRequest.of(0, 10, sortByCreated);
+        List<Booking> bookings = bookingRepository.findAllPastByUserIdAndSortByDesc(userId, page);
         if (bookings.isEmpty()) {
             throw new CommentByNotBookerException("Пользователь не брал предмет в аренду");
         }

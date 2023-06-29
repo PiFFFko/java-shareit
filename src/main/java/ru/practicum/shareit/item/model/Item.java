@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
@@ -27,18 +28,27 @@ public class Item {
     @ManyToOne
     @JoinColumn(name = "owner_id")
     User owner;
-    @Column(name = "request_id")
-    Long request;
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @JoinColumn(name = "request_id")
+    ItemRequest request;
     @Transient
     Booking nextBooking;
     @Transient
     Booking lastBooking;
 
-    public Item(Long id, String name, String description, Boolean available) {
+     public Item(Long id, String name, String description, Boolean available) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.available = available;
+    }
+
+    public Item(Long id, String name, String description, Boolean available, User owner) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.available = available;
+        this.owner = owner;
     }
 
     public Item(Long id) {
